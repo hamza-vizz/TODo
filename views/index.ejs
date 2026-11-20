@@ -1,11 +1,77 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title><%= title %></title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-  </head>
-  <body>
-    <h1><%= title %></h1>
-    <p>Welcome to <%= title %></p>
-  </body>
+
+<head>
+  <title>
+    <%= title %>
+  </title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+  <!-- Navigation Bar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+      <a class="navbar-brand" href="/">My Store</a>
+      <div class="navbar-nav ms-auto">
+        <% if (currentUser) { %>
+          <span class="navbar-text me-3">Welcome, <%= currentUser.name %>! (<%= currentUser.role %>)</span>
+
+          <!-- Show Admin link only if role is admin -->
+          <% if (currentUser.role==='admin' ) { %>
+            <a href="/admin/add-product" class="btn btn-warning btn-sm me-2">Add Product</a>
+            <% } %>
+
+              <a href="/auth/logout" class="btn btn-outline-danger btn-sm">Logout</a>
+              <% } else { %>
+                <a href="/auth/login" class="btn btn-outline-light btn-sm me-2">Login</a>
+                <a href="/auth/register" class="btn btn-primary btn-sm">Register</a>
+                <% } %>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="container mt-5">
+    <h1 class="mb-4 text-center">All Products</h1>
+
+    <% if (products.length===0) { %>
+      <div class="alert alert-info text-center">No products available yet. Check back later!</div>
+      <% } else { %>
+        <div class="row">
+          <% products.forEach(function(product) { %>
+            <div class="col-md-4 mb-4">
+              <div class="card h-100">
+                <img src="<%= product.imageUrl %>" class="card-img-top" alt="<%= product.name %>"
+                  style="height: 200px; object-fit: cover;">
+                <div class="card-body">
+                  <h5 class="card-title">
+                    <%= product.name %>
+                  </h5>
+                  <p class="card-text text-muted">
+                    <%= product.description %>
+                  </p>
+                  <h6 class="card-subtitle mb-2 text-primary">$<%= product.price %>
+                  </h6>
+
+                  <a href="/product/<%= product.id %>" class="btn btn-outline-dark mt-2 w-100">View Details &
+                    Reviews</a>
+
+                  <% if (currentUser && currentUser.role==='admin' ) { %>
+                    <form action="/admin/delete-product/<%= product.id %>" method="POST" class="mt-2">
+                      <button type="submit" class="btn btn-danger w-100"
+                        onclick="return confirm('Are you sure you want to delete this product?');">
+                        Delete Product
+                      </button>
+                    </form>
+                    <% } %>
+                </div>
+              </div>
+            </div>
+            <% }); %>
+        </div>
+        <% } %>
+  </div>
+</body>
+
 </html>
